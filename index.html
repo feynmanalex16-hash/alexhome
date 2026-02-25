@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alex's AI Portfolio</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+<style>
+:root {
+  --neon-purple: #a855f7;
+  --neon-cyan: #06b6d4;
+  --neon-pink: #ec4899;
+  --bg-dark: #030712;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  background: var(--bg-dark);
+  color: #e2e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+#vanta-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+.page {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* NAV */
+nav {
+  width: 100%;
+  padding: 18px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(16px);
+  background: rgba(3,7,18,0.5);
+  border-bottom: 1px solid rgba(168,85,247,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  font-size: 17px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-links { display: flex; gap: 24px; list-style: none; }
+.nav-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: #e2e8f0; }
+
+/* HERO */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 24px 70px;
+  text-align: center;
+  width: 100%;
+  max-width: 760px;
+}
+
+/* Avatar */
+.avatar-wrap {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  margin-bottom: 36px;
+}
+.avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--neon-purple), var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+  animation: spin 4s linear infinite;
+}
+.avatar-ring::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--bg-dark);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.avatar-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e1b4b, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  z-index: 1;
+}
+
+/* Title */
+.hero-title {
+  font-size: clamp(30px, 7vw, 60px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 18px;
+  position: relative;
+}
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, var(--neon-purple) 40%, var(--neon-cyan) 70%, var(--neon-pink) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradShift 5s ease infinite;
+}
+@keyframes gradShift {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.glitch { position: relative; display: inline-block; }
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0; width: 100%;
+  background: linear-gradient(135deg, #fff 0%, var(--neon-purple) 40%, var(--neon-cyan) 70%, var(--neon-pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.glitch::before {
+  animation: g1 4s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+.glitch::after {
+  animation: g2 4s infinite;
+  clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
+}
+@keyframes g1 {
+  0%,88%,100% { transform: translate(0); opacity: 0; }
+  90% { transform: translate(-3px,1px); opacity: 0.9; }
+  93% { transform: translate(3px,-1px); opacity: 0.9; }
+  95% { opacity: 0; }
+}
+@keyframes g2 {
+  0%,88%,100% { transform: translate(0); opacity: 0; }
+  91% { transform: translate(3px,2px); opacity: 0.9; }
+  94% { transform: translate(-3px,-2px); opacity: 0.9; }
+  96% { opacity: 0; }
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2.5vw, 18px);
+  color: #94a3b8;
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+
+/* Contact */
+.contact-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border-radius: 50px;
+  background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.3);
+  color: #c4b5fd;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.25s;
+  backdrop-filter: blur(8px);
+}
+.contact-badge:hover {
+  background: rgba(168,85,247,0.2);
+  border-color: rgba(168,85,247,0.6);
+  box-shadow: 0 0 20px rgba(168,85,247,0.3);
+  transform: translateY(-2px);
+}
+.contact-badge svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* SECTION */
+.section {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 24px 80px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(168,85,247,0.5), transparent);
+}
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--neon-purple);
+}
+
+/* GAME CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(15,15,30,0.75);
+  border: 1px solid rgba(168,85,247,0.15);
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(6,182,212,0.05));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(168,85,247,0.5);
+  box-shadow:
+    0 0 30px rgba(168,85,247,0.25),
+    0 0 60px rgba(168,85,247,0.1),
+    0 20px 40px rgba(0,0,0,0.4);
+}
+.card:hover::before { opacity: 1; }
+
+.card-glow {
+  position: absolute;
+  top: -40px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.4), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.card:hover .card-glow { opacity: 1; }
+
+.card-body { padding: 28px; position: relative; z-index: 1; }
+
+.card-icon {
+  font-size: 36px;
+  margin-bottom: 16px;
+  display: block;
+}
+.card-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+.card-url {
+  font-size: 13px;
+  color: #6366f1;
+  font-family: "SF Mono", "Fira Code", monospace;
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(99,102,241,0.15);
+  border: 1px solid rgba(99,102,241,0.3);
+  font-size: 12px;
+  color: #a5b4fc;
+  font-weight: 500;
+}
+
+.card-arrow {
+  position: absolute;
+  bottom: 24px; right: 24px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(168,85,247,0.15);
+  border: 1px solid rgba(168,85,247,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  z-index: 1;
+}
+.card:hover .card-arrow {
+  background: rgba(168,85,247,0.3);
+  transform: translate(2px, -2px);
+}
+.card-arrow svg { width: 14px; height: 14px; color: #c4b5fd; }
+
+/* FOOTER */
+footer {
+  width: 100%;
+  border-top: 1px solid rgba(168,85,247,0.1);
+  padding: 28px 24px;
+  text-align: center;
+  color: #334155;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+  background: rgba(3,7,18,0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  nav { padding: 16px 20px; }
+  .nav-links { gap: 16px; }
+  .hero { padding: 60px 20px 50px; }
+  .cards { grid-template-columns: 1fr; }
+  .section { padding: 0 20px 60px; }
+}
+@media (max-width: 400px) {
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="vanta-bg"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Alex.AI</div>
+    <ul class="nav-links">
+      <li><a href="#works">作品</a></li>
+      <li><a href="mailto:feynmanalex16@gmail.com">联系我</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-inner">🤖</div>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="glitch gradient-text" data-text="Alex 的 AI 作品集">Alex 的 AI 作品集</span>
+    </h1>
+
+    <p class="hero-sub">欢迎和我一起玩 AI ~~<br>探索人工智能的无限可能</p>
+
+    <a href="mailto:feynmanalex16@gmail.com" class="contact-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+      </svg>
+      feynmanalex16@gmail.com
+    </a>
+  </section>
+
+  <!-- WORKS -->
+  <section class="section" id="works">
+    <div class="section-header">
+      <span class="section-title">🎮 我的 AI 游戏</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="cards">
+
+      <a href="https://planetdefense.wallfacer.top" target="_blank" rel="noopener" class="card">
+        <div class="card-glow"></div>
+        <div class="card-body">
+          <span class="card-icon">🪐</span>
+          <div class="card-name">星球防御</div>
+          <div class="card-url">planetdefense.wallfacer.top</div>
+          <span class="card-tag">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            AI Game
+          </span>
+        </div>
+        <div class="card-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </a>
+
+      <a href="https://starwar.wallfacer.top" target="_blank" rel="noopener" class="card">
+        <div class="card-glow"></div>
+        <div class="card-body">
+          <span class="card-icon">🚀</span>
+          <div class="card-name">星际先锋</div>
+          <div class="card-url">starwar.wallfacer.top</div>
+          <span class="card-tag">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            AI Game
+          </span>
+        </div>
+        <div class="card-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Alex · Built with AI &amp; ❤️</p>
+  </footer>
+
+</div>
+
+<script>
+  VANTA.BIRDS({
+    el: "#vanta-bg",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    scale: 1.00,
+    scaleMobile: 1.00,
+    backgroundColor: 0x030712,
+    color1: 0xa855f7,
+    color2: 0x06b6d4,
+    colorMode: "lerp",
+    birdSize: 1.2,
+    wingSpan: 28,
+    speedLimit: 4,
+    separation: 60,
+    alignment: 50,
+    cohesion: 50,
+    quantity: 3
+  });
+</script>
+
+</body>
+</html>
